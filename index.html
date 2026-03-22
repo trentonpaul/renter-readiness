@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Renter Readiness Calculator</title>
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='11' cy='14' r='9' fill='%23ff5f4b'/%3E%3Ccircle cx='11' cy='14' r='4' fill='%23fdf8f2'/%3E%3Crect x='19' y='11.5' width='11' height='5' rx='2.5' fill='%23ff5f4b'/%3E%3Crect x='26' y='16.5' width='4' height='6' rx='1.5' fill='%23ff5f4b'/%3E%3Crect x='21' y='16.5' width='4' height='5' rx='1.5' fill='%23ff5f4b'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <div class="bg-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="blob blob-4"></div>
+  </div>
+
+  <div class="page">
+
+    <header>
+      <div class="eyebrow">Financial readiness</div>
+      <h1>Are you ready<br>to <em>rent?</em></h1>
+      <p class="subtitle">Enter your numbers and get an honest, weighted score across five financial factors every
+        prospective renter should know — no fluff, just clarity.</p>
+    </header>
+
+    <form id="calc-form" novalidate>
+
+      <!-- INCOME & RENT -->
+      <div class="card card-income">
+        <div class="card-title">Income & Rent</div>
+        <div class="card-desc">Your monthly take-home and the rent you're eyeing</div>
+        <div class="field-grid field-grid-2">
+          <div class="field">
+            <label>Monthly Take-Home Pay <span>(after tax)</span></label>
+            <div class="input-wrap">
+              <span class="input-prefix">$</span>
+              <input type="number" id="income" min="0" step="1" placeholder="4,000" required>
+            </div>
+          </div>
+          <div class="field">
+            <label>Expected Monthly Rent</label>
+            <div class="input-wrap">
+              <span class="input-prefix">$</span>
+              <input type="number" id="rent" min="0" step="1" placeholder="1,300" required>
+            </div>
+          </div>
+          <div class="field">
+            <label>Total Monthly Debt Payments <span>(loans, cards…)</span></label>
+            <div class="input-wrap">
+              <span class="input-prefix">$</span>
+              <input type="number" id="debt" min="0" step="1" placeholder="200" value="0">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SITUATION -->
+      <div class="card card-situation">
+        <div class="card-title">Your Situation</div>
+        <div class="card-desc">Move distance, movers, and how predictable your income is</div>
+        <div class="field-grid field-grid-2">
+          <div class="field">
+            <label>Move Distance</label>
+            <div class="select-wrap">
+              <select id="distance">
+                <option value="local" selected>Local</option>
+                <option value="medium">Medium (1–3 hrs)</option>
+                <option value="long">Long Distance (3+ hrs)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Income Stability</label>
+            <div class="select-wrap">
+              <select id="stability">
+                <option value="very_stable" selected>Very predictable — I know exactly what's coming in</option>
+                <option value="mostly_stable">Mostly predictable — occasional variation but generally reliable</option>
+                <option value="somewhat_stable">Somewhat unpredictable — changes month to month</option>
+                <option value="variable">Hard to predict — income varies significantly</option>
+                <option value="no_income">No income yet</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Movers toggle -->
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border);">
+          <label class="toggle-row" for="moversToggle">
+            <input type="checkbox" id="moversToggle">
+            <span class="toggle-track"></span>
+            <span class="toggle-label">I plan to use professional movers</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- SAVINGS -->
+      <div class="card card-savings">
+        <div class="card-title">Your Savings</div>
+        <div class="card-desc">Your emergency fund, plus whatever you're willing to spend on this move</div>
+        <div class="field-grid field-grid-2">
+          <div class="field">
+            <label>Emergency Fund Balance</label>
+            <div class="input-wrap">
+              <span class="input-prefix">$</span>
+              <input type="number" id="emergency" min="0" step="1" placeholder="5,000" required>
+            </div>
+          </div>
+          <div class="field">
+            <label>Savings Available for This Move <span>(not your emergency fund)</span></label>
+            <div class="input-wrap">
+              <span class="input-prefix">$</span>
+              <input type="number" id="movingFund" min="0" step="1" placeholder="1,800" value="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- Upfront cash toggle -->
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border);">
+          <label class="toggle-row" for="upfrontToggle">
+            <input type="checkbox" id="upfrontToggle">
+            <span class="toggle-track"></span>
+            <span class="toggle-label">I know my upfront move-in costs (security deposit, first/last month)</span>
+          </label>
+          <div class="upfront-field" id="upfrontField">
+            <div class="field">
+              <label>Total Upfront Move-In Cash Required</label>
+              <div class="input-wrap">
+                <span class="input-prefix">$</span>
+                <input type="number" id="upfrontCash" min="0" step="1" placeholder="3,900">
+              </div>
+            </div>
+          </div>
+          <p class="upfront-estimate" id="upfrontEstimate"></p>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button type="submit">Calculate my readiness →</button>
+      </div>
+    </form>
+
+    <!-- RESULTS -->
+    <div id="results">
+      <div class="result-hero">
+        <div class="score-ring-wrap">
+          <svg viewBox="0 0 148 148" width="148" height="148">
+            <circle class="ring-bg" cx="74" cy="74" r="60" />
+            <circle class="ring-fg" id="ringFg" cx="74" cy="74" r="60" />
+          </svg>
+          <div class="score-label">
+            <div class="score-num" id="scoreBig">—</div>
+            <div class="score-tier" id="scoreTierLabel">—</div>
+          </div>
+        </div>
+        <div class="result-text">
+          <div class="result-tier-badge" id="tierBadge">—</div>
+          <div class="result-message" id="resultMessage">—</div>
+          <div class="result-sub" id="resultSub">—</div>
+          <div class="credit-disclaimer">
+            <span class="credit-disclaimer-icon">💡</span>
+            <div class="credit-disclaimer-text">
+              <strong>One thing this score doesn't cover</strong>
+              Your credit history isn't factored in here, but landlords will check it. Requirements vary widely
+              depending on the market, property, and rent amount — what clears one application may not clear another.
+              Know where you stand before you apply. Get your free report at <a
+                href="https://www.annualcreditreport.com" target="_blank" rel="noopener"
+                style="color:#8a6800;font-weight:500;">annualcreditreport.com</a>, and check your actual score for free
+              directly from the bureaus — <a href="https://www.experian.com" target="_blank" rel="noopener"
+                style="color:#8a6800;font-weight:500;">Experian</a>, <a
+                href="https://www.equifax.com/personal/products/credit/free-credit-score/" target="_blank"
+                rel="noopener" style="color:#8a6800;font-weight:500;">Equifax</a>, or <a
+                href="https://www.transunion.com/free-credit-score" target="_blank" rel="noopener"
+                style="color:#8a6800;font-weight:500;">TransUnion</a> all offer one free.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="breakdown-card">
+        <div class="breakdown-title">How each factor scored</div>
+        <div id="factorBars"></div>
+      </div>
+
+      <button class="reset-btn" id="resetBtn">← Recalculate</button>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
