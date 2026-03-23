@@ -32,9 +32,9 @@
   function scoreDTI(pct) {
     if (pct <= 0)    return 100;
     if (pct <= 0.10) return 100;
-    if (pct <= 0.20) return 85;
-    if (pct <= 0.30) return 60;
-    if (pct <= 0.40) return 30;
+    if (pct <= 0.15) return 75;
+    if (pct <= 0.20) return 50;
+    if (pct <= 0.30) return 25;
     return 0;
   }
 
@@ -142,7 +142,7 @@
           detail: {
             yours:  `$${debt.toLocaleString()}/mo in debt payments = ${(dtiRatio*100).toFixed(1)}% of income`,
             ideal:  'Under 20% leaves healthy room for rent and living costs',
-            note:   dtiRatio <= 0.10 ? 'Very low debt load — this won\'t stress your budget.' : dtiRatio <= 0.20 ? 'Manageable, but keep an eye on it alongside rent.' : 'High debt-to-income can make landlords hesitant and budgets tight.'
+            note:   dtiRatio <= 0.10 ? 'Very low debt load — this won\'t stress your budget.' : dtiRatio <= 0.15 ? 'Manageable, but keep an eye on it alongside rent.' : dtiRatio <= 0.20 ? 'At this level, debt is starting to compete with rent for your income — worth paying down.' : 'High debt-to-income can make landlords hesitant and budgets very tight.'
           }
         },
         {
