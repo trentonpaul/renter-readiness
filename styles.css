@@ -113,7 +113,7 @@
 
   /* ── FORM FIELDS ── */
   .field-grid { display: grid; gap: 20px; }
-  .field-grid-2 { grid-template-columns: 1fr 1fr; align-items: end; }
+  .field-grid-2 { grid-template-columns: 1fr 1fr; }
   @media (max-width: 560px) { .field-grid-2 { grid-template-columns: 1fr; } }
 
   .field { display: flex; flex-direction: column; gap: 7px; }
@@ -152,6 +152,21 @@
     content: '▾'; position: absolute; right: 14px; top: 50%;
     transform: translateY(-50%); pointer-events: none;
     font-size: 0.75rem; color: rgba(26,16,37,0.4);
+  }
+
+  /* ── FIELD ERRORS ── */
+  .field-error {
+    font-size: 0.75rem;
+    color: #c73a27;
+    font-weight: 500;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(255, 95, 75, 0.1);
+    border-left: 2.5px solid var(--coral);
+    border-radius: 8px;
+    display: block;
+    letter-spacing: 0.02em;
+    line-height: 1.4;
   }
 
   /* ── SUBMIT ── */
@@ -378,7 +393,7 @@
     transition: max-height 0.3s ease, opacity 0.3s ease;
     opacity: 0;
   }
-  .upfront-field.open { max-height: 100px; opacity: 1; }
+  .upfront-field.open { max-height: 200px; opacity: 1; }
   .upfront-estimate {
     font-size: 0.78rem; color: rgba(26,16,37,0.45); font-style: italic;
     margin-top: 6px; line-height: 1.5;

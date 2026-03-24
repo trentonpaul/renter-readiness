@@ -58,21 +58,21 @@
         <div class="card-desc">Your monthly take-home and the rent you're eyeing</div>
         <div class="field-grid field-grid-2">
           <div class="field">
-            <label>Monthly Take-Home Pay <span>(after tax)</span></label>
+            <label for="income">Monthly Take-Home Pay <span>(after tax)</span></label>
             <div class="input-wrap">
               <span class="input-prefix">$</span>
-              <input type="number" id="income" min="0" step="1" placeholder="4,000" required>
+              <input type="number" id="income" min="0" step="1" placeholder="4,000" required aria-required="true">
             </div>
           </div>
           <div class="field">
-            <label>Expected Monthly Rent</label>
+            <label for="rent">Expected Monthly Rent</label>
             <div class="input-wrap">
               <span class="input-prefix">$</span>
-              <input type="number" id="rent" min="0" step="1" placeholder="1,300" required>
+              <input type="number" id="rent" min="0" step="1" placeholder="1,300" required aria-required="true">
             </div>
           </div>
           <div class="field">
-            <label>Total Monthly Debt Payments <span>(loans, cards…)</span></label>
+            <label for="debt">Total Monthly Debt Payments <span>(loans, cards…)</span></label>
             <div class="input-wrap">
               <span class="input-prefix">$</span>
               <input type="number" id="debt" min="0" step="1" placeholder="200" value="0">
@@ -87,7 +87,7 @@
         <div class="card-desc">Move distance, movers, and how predictable your income is</div>
         <div class="field-grid field-grid-2">
           <div class="field">
-            <label>Move Distance</label>
+            <label for="distance">Move Distance</label>
             <div class="select-wrap">
               <select id="distance">
                 <option value="local" selected>Local (1–25 mi)</option>
@@ -97,7 +97,7 @@
             </div>
           </div>
           <div class="field">
-            <label>Income Stability</label>
+            <label for="stability">Income Stability</label>
             <div class="select-wrap">
               <select id="stability">
                 <option value="very_stable" selected>Very predictable — I know exactly what's coming in</option>
@@ -126,14 +126,14 @@
         <div class="card-desc">Your emergency fund, plus whatever you're willing to spend on this move</div>
         <div class="field-grid field-grid-2">
           <div class="field">
-            <label>Emergency Fund Balance</label>
+            <label for="emergency">Emergency Fund Balance</label>
             <div class="input-wrap">
               <span class="input-prefix">$</span>
-              <input type="number" id="emergency" min="0" step="1" placeholder="5,000" required>
+              <input type="number" id="emergency" min="0" step="1" placeholder="5,000" required aria-required="true">
             </div>
           </div>
           <div class="field">
-            <label>Savings Available for This Move <span>(not your emergency fund)</span></label>
+            <label for="movingFund">Other Savings Available for This Move</label>
             <div class="input-wrap">
               <span class="input-prefix">$</span>
               <input type="number" id="movingFund" min="0" step="1" placeholder="1,800" value="0">
@@ -150,7 +150,7 @@
           </label>
           <div class="upfront-field" id="upfrontField">
             <div class="field">
-              <label>Total Upfront Move-In Cash Required</label>
+              <label for="upfrontCash">Total Upfront Move-In Cash Required</label>
               <div class="input-wrap">
                 <span class="input-prefix">$</span>
                 <input type="number" id="upfrontCash" min="0" step="1" placeholder="3,900">

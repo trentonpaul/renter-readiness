@@ -157,6 +157,7 @@ function calculate(inputs) {
     ]
   };
 }
+
 /* ── RENDER ── */
 
 const TIER_COLORS = { excellent: '#4a90e2', good: '#3ecfb2', medium: '#f5c842', low: '#ff5f4b' };
@@ -237,23 +238,130 @@ function renderResults(res) {
   });
 }
 
+/* ── INPUT CAPS ── */
+
+const FIELD_CAPS = {
+  income:      { max: 50000,   label: 'Monthly take-home'         },
+  rent:        { max: 10000,   label: 'Expected rent'             },
+  debt:        { max: 10000,   label: 'Monthly debt payments'     },
+  emergency:   { max: 500000,  label: 'Emergency fund'            },
+  movingFund:  { max: 100000,  label: 'Moving savings'            },
+  upfrontCash: { max: 100000,  label: 'Upfront move-in cash'      },
+};
+
+// Inject an inline error element beneath each capped input
+function getOrCreateError(id) {
+  const existing = document.getElementById(`err-${id}`);
+  if (existing) return existing;
+  const el = document.getElementById(id);
+  const err = document.createElement('p');
+  err.id = `err-${id}`;
+  err.className = 'field-error';
+  err.setAttribute('aria-live', 'polite');
+  // Insert right after the input-wrap div
+  el.closest('.input-wrap').insertAdjacentElement('afterend', err);
+  // Associate the error with the input
+  el.setAttribute('aria-describedby', `err-${id}`);
+  return err;
+}
+
+function clearError(id) {
+  const err = document.getElementById(`err-${id}`);
+  if (err) {
+    err.remove();
+    // Remove the aria-describedby association
+    const el = document.getElementById(id);
+    if (el) {
+      const describedBy = el.getAttribute('aria-describedby');
+      if (describedBy === `err-${id}`) {
+        el.removeAttribute('aria-describedby');
+      } else if (describedBy) {
+        // If there are multiple, remove this one
+        const ids = describedBy.split(' ').filter(d => d !== `err-${id}`);
+        if (ids.length) {
+          el.setAttribute('aria-describedby', ids.join(' '));
+        } else {
+          el.removeAttribute('aria-describedby');
+        }
+      }
+    }
+  }
+}
+
+function setError(id, msg) {
+  getOrCreateError(id).textContent = msg;
+}
+
+// Attach clamping listeners to every capped field
+Object.entries(FIELD_CAPS).forEach(([id, { max, label }]) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  el.addEventListener('input', () => {
+    const raw = parseFloat(el.value);
+    if (!isNaN(raw) && raw > max) {
+      el.value = max;
+      setError(id, `${label} can't exceed $${max.toLocaleString()}/mo — capped.`);
+    } else {
+      clearError(id);
+    }
+
+    // Re-run cross-field check whenever income or rent changes
+    if (id === 'income' || id === 'rent') validateRentVsIncome();
+  });
+
+  // Preserve existing blur-rounding behaviour
+  el.addEventListener('blur', () => {
+    if (el.value !== '') el.value = Math.round(parseFloat(el.value));
+  });
+});
+
+/* ── CROSS-FIELD: rent must not exceed income ── */
+
+function validateRentVsIncome() {
+  const income = parseFloat(document.getElementById('income').value) || 0;
+  const rent   = parseFloat(document.getElementById('rent').value)   || 0;
+  if (income > 0 && rent >= income) {
+    setError('rent', 'Rent can\'t equal or exceed your take-home pay.');
+    return false;
+  }
+  clearError('rent');
+  return true;
+}
+
+/* ── UPFRONT CASH REQUIRED WHEN TOGGLE IS ON ── */
+
+function validateUpfrontCash() {
+  if (!upfrontToggle.checked) {
+    clearError('upfrontCash');
+    return true;
+  }
+  const upfrontCash = parseFloat(document.getElementById('upfrontCash').value);
+  if (!upfrontCash || isNaN(upfrontCash) || upfrontCash <= 0) {
+    setError('upfrontCash', 'Please enter your upfront move-in costs.');
+    return false;
+  }
+  clearError('upfrontCash');
+  return true;
+}
+
 /* ── UPFRONT TOGGLE ── */
 const upfrontToggle = document.getElementById('upfrontToggle');
-const upfrontField = document.getElementById('upfrontField');
-const upfrontEstEl = document.getElementById('upfrontEstimate');
-const moversToggle = document.getElementById('moversToggle');
+const upfrontField  = document.getElementById('upfrontField');
+const upfrontEstEl  = document.getElementById('upfrontEstimate');
+const moversToggle  = document.getElementById('moversToggle');
 
 function updateUpfrontEstimate() {
-  const rent = parseFloat(document.getElementById('rent').value) || 0;
-  const distance = document.getElementById('distance').value;
+  const rent      = parseFloat(document.getElementById('rent').value) || 0;
+  const distance  = document.getElementById('distance').value;
   const usesMovers = moversToggle.checked;
   if (!upfrontToggle.checked && rent > 0) {
-    const upfront = upfrontEstimate(rent, distance);
-    const movCost = movingCost(distance, usesMovers);
-    const total = upfront + movCost;
+    const upfront    = upfrontEstimate(rent, distance);
+    const movCost    = movingCost(distance, usesMovers);
+    const total      = upfront + movCost;
     const multiplier = distance === 'long' ? '3×' : '2×';
     const depositNote = distance === 'long' ? 'first + last month + security deposit' : 'first month + security deposit';
-    const moversNote = usesMovers ? 'professional movers' : 'DIY move';
+    const moversNote  = usesMovers ? 'professional movers' : 'DIY move';
     upfrontEstEl.textContent = `We'll estimate $${upfront.toLocaleString()} for move-in costs (${multiplier} rent — ${depositNote}) + $${movCost.toLocaleString()} for ${moversNote} = $${total.toLocaleString()} total target.`;
   } else {
     upfrontEstEl.textContent = '';
@@ -263,45 +371,76 @@ function updateUpfrontEstimate() {
 upfrontToggle.addEventListener('change', () => {
   upfrontField.classList.toggle('open', upfrontToggle.checked);
   updateUpfrontEstimate();
+  validateUpfrontCash();
 });
+document.getElementById('upfrontCash').addEventListener('blur', validateUpfrontCash);
 moversToggle.addEventListener('change', updateUpfrontEstimate);
 document.getElementById('rent').addEventListener('input', updateUpfrontEstimate);
 document.getElementById('distance').addEventListener('change', updateUpfrontEstimate);
 
-/* ── EVENTS ── */
-
-/* ── ROUND MONEY INPUTS ON BLUR ── */
-['income', 'rent', 'debt', 'emergency', 'movingFund', 'upfrontCash'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('blur', () => {
-    if (el.value !== '') el.value = Math.round(parseFloat(el.value));
-  });
-});
+/* ── FORM SUBMIT ── */
 
 document.getElementById('calc-form').addEventListener('submit', (e) => {
   e.preventDefault();
-  const v = (id) => parseFloat(document.getElementById(id).value) || 0;
+
+  // Cross-field checks block submission
+  if (!validateRentVsIncome()) {
+    document.getElementById('rent').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('rent').focus();
+    return;
+  }
+
+  if (!validateUpfrontCash()) {
+    document.getElementById('upfrontCash').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('upfrontCash').focus();
+    return;
+  }
+
+  const v = (id) => {
+    const val = parseFloat(document.getElementById(id).value);
+    return (isNaN(val) || val < 0) ? 0 : val;
+  };
   const upfrontKnown = upfrontToggle.checked;
   const inputs = {
-    income: v('income'),
-    rent: v('rent'),
-    debt: v('debt'),
-    emergency: v('emergency'),
-    movingFund: v('movingFund'),
-    distance: document.getElementById('distance').value,
-    stability: document.getElementById('stability').value,
-    usesMovers: moversToggle.checked,
+    income:      v('income'),
+    rent:        v('rent'),
+    debt:        v('debt'),
+    emergency:   v('emergency'),
+    movingFund:  v('movingFund'),
+    distance:    document.getElementById('distance').value,
+    stability:   document.getElementById('stability').value,
+    usesMovers:  moversToggle.checked,
     upfrontKnown,
     upfrontCash: upfrontKnown ? v('upfrontCash') : 0,
   };
-  if (!inputs.income || !inputs.rent) {
-    alert('Please enter your monthly take-home pay and expected rent at minimum.');
+
+  // Validate that income and rent are non-zero
+  if (!inputs.income) {
+    setError('income', 'Please enter a monthly take-home pay greater than $0.');
+    document.getElementById('income').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('income').focus();
     return;
   }
+  clearError('income');
+
+  if (!inputs.rent) {
+    setError('rent', 'Please enter an expected rent greater than $0.');
+    document.getElementById('rent').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('rent').focus();
+    return;
+  }
+  clearError('rent');
+
+  if (!inputs.emergency) {
+    setError('emergency', 'Please enter an emergency fund balance greater than $0.');
+    document.getElementById('emergency').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('emergency').focus();
+    return;
+  }
+  clearError('emergency');
+
   const res = calculate(inputs);
-  gtag('event', 'calculator_submitted', {
-    score: res.total
-  });
+  gtag('event', 'calculator_submitted', { score: res.total });
   renderResults(res);
 
   const resultsEl = document.getElementById('results');
